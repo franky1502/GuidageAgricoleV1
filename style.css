@@ -1,0 +1,397 @@
+body {
+    margin: 0;
+    padding: 0;
+    background: #f4f4f4;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    max-width: 500px;
+    margin: auto;
+    padding: 15px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+/* ---------- Boutons A et B ---------- */
+
+.reference {
+    display: flex;
+    gap: 10px;
+}
+
+.reference button {
+    flex: 1;
+}
+
+.lettreAB {
+    font-size: 42px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+/* ---------- Paramètres ---------- */
+
+.parametres {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.parametres > div {
+    flex: 1;
+}
+
+.parametres label {
+    display: block;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+input[type=number] {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    font-size: 20px;
+}
+
+/* ---------- Boutons ---------- */
+
+button {
+    width: 100%;
+    padding: 16px;
+    font-size: 18px;
+}
+
+/* ---------- Guidage ---------- */
+
+#guidage {
+
+    position: relative;
+
+    height: 350px;
+
+    margin-top: 20px;
+
+    background: white;
+
+    border: 2px solid #cccccc;
+
+    overflow: hidden;
+}
+
+/* Ligne verte */
+
+#ligneReference {
+
+    position: absolute;
+
+    left: 50%;
+
+    top: 0;
+
+    width: 4px;
+
+    height: 100%;
+
+    transform: translateX(-50%);
+
+    background:
+        repeating-linear-gradient(
+            to bottom,
+            green 0px,
+            green 12px,
+            transparent 12px,
+            transparent 24px
+        );
+}
+
+/* etatReference */
+
+#etatReference {
+
+    margin-top: 10px;
+
+    text-align: center;
+
+    font-weight: bold;
+
+    color: #444;
+}
+
+/* Tracteur */
+
+#tracteur {
+
+    position: absolute;
+
+    left: 50%;
+
+    top: 240px;
+
+    width: 30px;
+
+    height: 60px;
+
+    transform: translateX(-50%);
+
+    background: green;
+}
+
+/* Ecart */
+
+#ecart {
+
+    position: absolute;
+
+    left: 58%;
+
+    top: 195px;
+
+    font-size: 28px;
+
+    font-weight: bold;
+
+    color: red;
+
+    white-space: nowrap;
+
+    min-width: 160px;
+
+    text-align: center;
+}
+
+/* ---------- Lignes ---------- */
+
+#lignes {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-top: 15px;
+
+    font-size: 28px;
+}
+
+#distances {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-top: 2px;
+
+    padding-left: 5px;
+
+    padding-right: 5px;
+
+    font-size: 14px;
+}
+
+#distanceMoins,
+#distanceActive,
+#distancePlus {
+
+     width: auto;
+
+    text-align: center;
+}
+
+#distanceMoins,
+#distancePlus {
+
+    font-size: 14px;
+
+    color: #888;
+}
+
+#distanceActive {
+
+    font-size: 18px;
+
+    color: #666;
+}
+
+#ligneActive {
+
+    font-size: 42px;
+
+    font-weight: bold;
+
+    color: green;
+}
+
+#infoLigne {
+    text-align: center;
+    margin-top: 4px;
+    font-size: 18px;
+    color: #666;
+}
+
+/* ---------- Vitesse ---------- */
+
+#vitesse {
+
+    text-align: center;
+
+    margin-top: 10px;
+
+    font-size: 30px;
+
+    font-weight: bold;
+}
+
+/* ---------- Actions ---------- */
+
+.actions {
+
+    display: flex;
+
+    gap: 10px;
+
+    margin-top: 15px;
+}
+
+.actions button {
+
+    flex: 1;
+}
+
+#sigma {
+    text-align: center;
+    margin-top: 4px;
+    font-size: 18px;
+    color: #666;
+}
+
+.modeReference {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.titreModeRef {
+    font-weight: bold;
+    margin-right: 15px;
+}
+
+#simulation {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 10px;
+    #simulation button {
+
+    padding: 3px 5px;
+    min-width: 30px;
+    font-size: 12px;
+}
+}
+
+#infosBas {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-top: 10px;
+}
+
+#vitesse,
+#sigma,
+#avancement {
+
+    flex: 1;
+
+    text-align: center;
+
+    font-size: 20px;
+    font-weight: bold;
+    color: #666;
+}
+
+.clignote {
+    background-color: #ffcc66 !important;
+    border: 2px solid #ff9900 !important;
+    animation: clignote 1s infinite;
+}
+
+@keyframes clignote {
+
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+#tableauGPSContainer {
+    width: 100%;
+    height: 75vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin-top: 8px;
+    border: 1px solid #999;
+}
+
+#tableauGPS {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: auto;
+    font-size: 14px;
+    text-align: center;
+}
+
+#tableauGPS th,
+#tableauGPS td {
+    border-top: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-bottom: 1px solid #cccccc;
+    padding: 2px 1px;
+    line-height: 1.05;
+    white-space: nowrap;
+}
+
+#tableauGPS thead th {
+    position: sticky;
+    top: 0;
+    background: #eeeeee;
+    z-index: 2;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+#tableauGPS .ligneSuspecte {
+    color: #e67e00;
+    font-weight: bold;
+}
+
+#tableauGPS .ligneRejetee {
+    color: red;
+    background-color: #ffe0e0;
+    font-weight: bold;
+}
+
+#filtreGPSInfo {
+    font-size: 14px;
+    text-align: center;
+    margin-top: 4px;
+    font-weight: bold;
+}

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guidage Agricole V1</title>
+<link rel="apple-touch-icon" href="icon.png">
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+
+
+<div class="container">
+
+<h1>GUIDAGE AGRICOLE</h1>
+
+<div class="modeReference">
+
+    <span class="titreModeRef">
+        Mode détermination A-B :
+    </span>
+    
+    <label>
+        <input
+            type="radio"
+            name="modeRef"
+            value="bord"
+            checked>
+        Bord parcelle
+    </label>
+
+    <label>
+        <input
+            type="radio"
+            name="modeRef"
+            value="centre">
+        Référence centrale
+    </label>
+
+</div>
+
+<div class="reference">
+
+    <button id="btnStartRef">
+        <span class="lettreAB">A</span><br>
+        Début réf.
+    </button>
+
+    <button id="btnStopRef">
+        <span class="lettreAB">B</span><br>
+        Fin réf.
+    </button>
+
+</div>
+
+<div id="etatReference">
+    Référence non définie
+</div>
+
+<div class="parametres">
+
+    <div>
+        <label>1ère passe</label>
+        <input type="number" value="14">
+    </div>
+
+    <div>
+        <label>Largeur</label>
+        <input type="number" value="20">
+    </div>
+
+</div>
+
+<<div class="bloc">
+
+    <label>
+        <input
+            type="checkbox"
+            checked
+            id="chkDemiTourAuto">
+        Demi-tour auto
+    </label>
+
+    <label>
+    <input
+        type="checkbox"
+        id="chkGPS"
+        checked>
+    GPS réel
+</label>
+
+</div>
+
+<div id="guidage">
+
+    <div id="ecart">
+        ← 0,8 m
+    </div>
+
+    <div id="tracteur"></div>
+
+    <div id="ligneReference"></div>
+
+</div>
+
+<div id="lignes">
+
+    
+
+    <span id="ligneMoins">11</span>
+
+    <span id="ligneActive">12</span>
+
+    <span id="lignePlus">13</span>
+
+</div>
+
+
+<div id="distances">
+    <span id="distanceMoins"></span>
+    <span id="distanceActive"></span>
+    <span id="distancePlus"></span>
+</div>
+
+<div id="infosBas">
+
+    <span id="vitesse">
+        7,1 km/h
+    </span>
+
+    <span id="sigma"></span>
+
+    <span id="avancement"></span>
+
+</div>
+
+<div id="debugEcart"></div>
+
+<div class="actions">
+
+   <button id="btnPause">
+        PAUSE / Semoir vide
+    </button>
+
+    <button id="btnReprendre">
+        REPRENDRE
+    </button> 
+
+</div>
+
+<div id="simulation">
+    <button id="btnGauche">◀</button>
+    <button id="btnDroite">▶</button>
+    <button id="btnAuto">AUTO</button>
+    <button id="btnTestDemiTour">TEST DT</button>
+    <button id="btnInverserDT">DT ↔</button>
+    <button id="btnTestRaccrochage">RAC</button>
+</div>
+
+
+<div class="actions">
+
+    <button id="btnMoins">Ligne -</button>
+
+    <button id="btnPlus">Ligne +</button>
+
+</div>
+
+
+<div id="tableauGPSContainer">
+
+    <table id="tableauGPS">
+
+        <thead>
+            <tr>
+                <th>Pi</th>
+                <th>Xi</th>
+                <th>Yi</th>
+                <th>km/h</th>
+                <th>GPS</th>
+                <th>CpDn</th>
+                <th>d_Dn</th>
+                <th>σ</th>
+            </tr>
+        </thead>
+
+        <tbody id="corpsTableauGPS">
+        </tbody>
+
+    </table>
+
+</div>
+
+<div id="filtreGPSInfo"></div>
+
+</div>
+
+
+<script src="app.js?v=12345"></script>
+
+
+</body>
+</html>
