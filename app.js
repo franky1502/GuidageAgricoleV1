@@ -68,10 +68,13 @@ let pointsGPSAcceptes = [];
 
 const SEUIL_DISTANCE = 1.00;
 const SEUIL_REJET = 2.00;
+const VITESSE_MIN_DN = 3.0; // km/h
+const NB_POINTS_MIN_DN = 5;
 
 const chkGPS =
     document.getElementById("chkGPS");
-
+const VITESSE_MIN_DN = 3.0; // km/h
+const NB_POINTS_MIN_DN = 5;
 modeGPS =
     chkGPS.checked;
 
@@ -1221,6 +1224,9 @@ function demarrerGPS() {
             const vitesse =
                 position.coords.speed ?? 0;
 
+            const vitesseKmH =
+            vitesse * 3.6;
+
             const cap =
                 position.coords.heading;
 
@@ -1302,6 +1308,8 @@ function demarrerGPS() {
                 statut:
                     "ACCEPTE",
 
+                statut: "INITIALISATION",    
+
                 suspect:
                     false,
 
@@ -1322,6 +1330,18 @@ function demarrerGPS() {
                 nouveauPoint
             );
 
+           if (
+             vitesseKmH < VITESSE_MIN_DN
+            ) {
+
+            nouveauPoint.statut =
+            "INITIALISATION";
+
+            afficherFenetreGPS(null);
+
+             return;
+            } 
+
             while (
     historiqueGPS.length >
     NB_POINTS_AFFICHAGE
@@ -1338,11 +1358,42 @@ function demarrerGPS() {
              *    à la Dn qui sert à le qualifier.
              */
 
-            const donneesDnAvant =
-                calculerDonneesDn(
-                    pointsGPSAcceptes
-                );
+            if (
+    pointsGPSAcceptes.length === 0
+) {
 
+    nouveauPoint.statut =
+        "DEPART";
+
+    pointsGPSAcceptes.push(
+        nouveauPoint
+    );
+
+    afficherFenetreGPS(null);
+
+    return;
+}
+
+            let donneesDnAvant = {
+
+    trajectoire: null,
+
+    capDn: null,
+
+    sigma: 0
+};
+
+if (
+    pointsGPSAcceptes.length >=
+    NB_POINTS_MIN_DN
+) {
+
+    donneesDnAvant =
+        calculerDonneesDn(
+            pointsGPSAcceptes
+        );
+}
+           
 
             /*
              * 8. Seuils fixes
@@ -1559,6 +1610,9 @@ function demarrerGPS() {
                  */
 
                 else {
+
+                    nouveauPoint.statut =
+                    "ACCEPTE";
 
                     pointRejete =
                         true;
@@ -2243,6 +2297,28 @@ function afficherFenetreGPS(donneesDn) {
 
         const ligne =
             document.createElement("tr");
+
+if (
+    point.statut === "DEPART"
+) {
+
+    ligne.classList.add(
+        "ligneDepart"
+    );
+
+}
+else if (
+    point.statut === "INITIALISATION"
+) {
+
+    ligne.classList.add(
+        "ligneInitialisation"
+    );
+
+}
+else if (
+    point.statut === "SUSPECT"
+) {
 
         if (point.statut === "SUSPECT") {
 

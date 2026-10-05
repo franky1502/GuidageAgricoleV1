@@ -395,3 +395,20 @@ button {
     margin-top: 4px;
     font-weight: bold;
 }
+
+.ligneInitialisation {
+    background: #eeeeee;
+}
+
+.ligneDepart {
+    background: #b7ffb7;
+    font-weight: bold;
+}
+
+.ligneSuspecte {
+    background: #ffe3a3;
+}
+
+.ligneRejetee {
+    background: #ffb0b0;
+}
