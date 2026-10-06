@@ -1308,9 +1308,6 @@ function demarrerGPS() {
                 ecartDnPrisEnCompte:
                     null,
 
-                statut:
-                    "ACCEPTE",
-
                 statut: "INITIALISATION",    
 
                 suspect:
@@ -2337,12 +2334,15 @@ else if (
 }
 
         const capGPS =
-            point.cap != null
-                ? point.cap.toFixed(0)
-                : "---";
+    Number.isFinite(point.cap)
+    ? point.cap.toFixed(0)
+    : "---";
 
         const capDn =
-    point.capDnTest !== null
+    (
+        point.capDnTest != null &&
+        Number.isFinite(point.capDnTest)
+    )
     ? point.capDnTest.toFixed(0)
     : "---";
 
@@ -2352,12 +2352,9 @@ else if (
         : "---";
 
         const sigma =
-        point.sigma !== null
-        ? point.sigma.toFixed(2
-
-
-        )
-        : "---";
+    Number.isFinite(point.sigma)
+    ? point.sigma.toFixed(2)
+    : "---";
 
         ligne.innerHTML =
 
