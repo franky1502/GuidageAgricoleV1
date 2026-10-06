@@ -1290,6 +1290,9 @@ function demarrerGPS() {
                 cap:
                     cap,
 
+                capDnTest:
+                null,   
+
                 capDn:
                     null,
 
@@ -1426,6 +1429,9 @@ if (
             if (
                 donneesDnAvant.trajectoire
             ) {
+
+                nouveauPoint.capDnTest =
+        donneesDnAvant.capDn;
 
                 const distanceTest =
                     calculerDistancePointDn(
@@ -2319,12 +2325,13 @@ else if (
 else if (
     point.statut === "SUSPECT"
 ) {
-
-        if (point.statut === "SUSPECT") {
+ 
 
     ligne.classList.add("ligneSuspecte");
 
-} else if (point.statut === "REJETE") {
+}
+ else if (point.statut === "REJETE")
+     {
 
     ligne.classList.add("ligneRejetee");
 }
@@ -2335,9 +2342,9 @@ else if (
                 : "---";
 
         const capDn =
-        point.capDn !== null
-        ? point.capDn.toFixed(0)
-        : "---";
+    point.capDnTest !== null
+    ? point.capDnTest.toFixed(0)
+    : "---";
 
         const distanceDn =
     point.distancePnDnAvantTest !== null
