@@ -73,8 +73,6 @@ const NB_POINTS_MIN_DN = 5;
 
 const chkGPS =
     document.getElementById("chkGPS");
-const VITESSE_MIN_DN = 3.0; // km/h
-const NB_POINTS_MIN_DN = 5;
 modeGPS =
     chkGPS.checked;
 
@@ -2393,10 +2391,11 @@ else if (
         /*
          * Ajout dans l'ordre :
          * plus récent en haut
-         */
+        */ 
 
         corps.appendChild(ligne);
     }
+           
 }
 
 
