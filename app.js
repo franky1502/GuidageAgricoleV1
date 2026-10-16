@@ -66,6 +66,18 @@ let longitudeOrigine = null;
 let nombrePointsGPS = 0;
 let pointsGPSAcceptes = [];
 
+
+/* Construction de la référence A-B en GPS réel */
+
+const NB_POINTS_DEPART_AB = 20;
+const VITESSE_DEPART_AB = 3.0; // km/h
+const DUREE_CONFIRMATION_AB_MS = 3000; // 3 secondes
+
+let etatConstructionAB = "REPOS";
+let debutVitesseAB = null;
+let pointsReferenceAB = [];
+
+
 const SEUIL_DISTANCE = 1.00;
 const SEUIL_REJET = 2.00;
 const VITESSE_MIN_DN = 3.0; // km/h
@@ -155,25 +167,189 @@ reinitialiserSigma()
     afficher();
 });
 
+
 btnA.addEventListener("click", () => {
 
-    pointA = {
-        x: 0,
-        y: 0
-    };
+    // MODE SIMULATEUR : conserver le fonctionnement actuel
+    if (!modeGPS) {
 
-    document.getElementById("etatReference").textContent =
-        "Point A enregistré";
+        pointA = {
+            x: 0,
+            y: 0
+        };
+
+        document.getElementById("etatReference").textContent =
+            "Point A enregistré (simulateur)";
 
         btnA.style.background = "#00aa00";
         btnA.style.color = "white";
         btnB.style.background = "#ff9800";
         btnB.style.color = "black";
+
+        return;
+    }
+
+    // MODE GPS RÉEL : vérifier les positions disponibles
+    if (historiqueGPS.length < NB_POINTS_DEPART_AB) {
+
+        document.getElementById("etatReference").textContent =
+            "Attendre 20 points GPS avant de définir A";
+
+        return;
+    }
+
+    // Calculer le barycentre des 20 dernières positions GPS
+    const derniersPoints =
+        historiqueGPS.slice(-NB_POINTS_DEPART_AB);
+
+    const sommeX = derniersPoints.reduce(
+        (somme, point) => somme + point.x, 0
+    );
+
+    const sommeY = derniersPoints.reduce(
+        (somme, point) => somme + point.y, 0
+    );
+
+    pointA = {
+        x: sommeX / derniersPoints.length,
+        y: sommeY / derniersPoints.length
+    };
+
+    // Préparer la construction de la référence
+    pointsReferenceAB = [];
+    debutVitesseAB = null;
+    etatConstructionAB = "ATTENTE_VITESSE";
+
+    document.getElementById("etatReference").textContent =
+        "Point A enregistré — attente de vitesse ≥ 3 km/h";
+
+    btnA.style.background = "#00aa00";
+    btnA.style.color = "white";
+    btnB.style.background = "#ff9800";
+    btnB.style.color = "black";
+
 });
 
 
 
 btnB.addEventListener("click", () => {
+
+    
+    // MODE GPS REEL : terminer la construction de A-B
+    if (modeGPS) {
+
+        if (etatConstructionAB !== "ENREGISTREMENT") {
+            document.getElementById("etatReference").textContent =
+                "Trajet non enregistré : attendre le démarrage GPS";
+
+            return;
+        }
+
+        if (pointsReferenceAB.length < 5) {
+            document.getElementById("etatReference").textContent =
+                "Pas assez de points GPS pour calculer A-B";
+
+            return;
+        }
+
+        // Ajuster une droite à tous les points du trajet
+        const trajectoireAB =
+            calculerTrajectoireDn(pointsReferenceAB);
+
+        if (!trajectoireAB) {
+            document.getElementById("etatReference").textContent =
+                "Impossible de calculer la référence A-B";
+
+            return;
+        }
+
+        // Projeter les points sur la droite ajustée
+        let projectionMin = Infinity;
+        let projectionMax = -Infinity;
+        let sommeDistances = 0;
+        let distancesSignees = [];
+
+        for (const point of pointsReferenceAB) {
+
+            const dx = point.x - trajectoireAB.x;
+            const dy = point.y - trajectoireAB.y;
+
+            const projection =
+                dx * trajectoireAB.vx +
+                dy * trajectoireAB.vy;
+
+            projectionMin = Math.min(projectionMin, projection);
+            projectionMax = Math.max(projectionMax, projection);
+
+            const distanceSignee =
+                dx * trajectoireAB.vy -
+                dy * trajectoireAB.vx;
+
+            distancesSignees.push(distanceSignee);
+            sommeDistances += distanceSignee;
+        }
+
+        // Définir A et B aux extrémités projetées du trajet
+        pointA = {
+            x: trajectoireAB.x + projectionMin * trajectoireAB.vx,
+            y: trajectoireAB.y + projectionMin * trajectoireAB.vy
+        };
+
+        pointB = {
+            x: trajectoireAB.x + projectionMax * trajectoireAB.vx,
+            y: trajectoireAB.y + projectionMax * trajectoireAB.vy
+        };
+
+        longueurAB = projectionMax - projectionMin;
+
+        // Calculer le cap de la référence
+        const angleMath =
+            Math.atan2(
+                pointB.y - pointA.y,
+                pointB.x - pointA.x
+            ) * 180 / Math.PI;
+
+        capAB = 90 - angleMath;
+
+        if (capAB < 0) capAB += 360;
+        if (capAB >= 360) capAB -= 360;
+
+        // Calculer l'écart-type des distances à la droite
+        const moyenneDistances =
+            sommeDistances / distancesSignees.length;
+
+        let sommeCarresDistances = 0;
+
+        for (const distance of distancesSignees) {
+            sommeCarresDistances +=
+                (distance - moyenneDistances) ** 2;
+        }
+
+        const sigmaAB = Math.sqrt(
+            sommeCarresDistances / distancesSignees.length
+        );
+
+        // Terminer l'enregistrement
+        etatConstructionAB = "TERMINE";
+
+        btnA.style.background = "#00aa00";
+        btnA.style.color = "white";
+        btnB.style.background = "#00aa00";
+        btnB.style.color = "white";
+
+        document.getElementById("etatReference").textContent =
+            "Référence GPS calculée | " +
+            pointsReferenceAB.length + " points | " +
+            longueurAB.toFixed(1) + " m | Cap : " +
+            capAB.toFixed(1) + "° | σAB : " +
+            sigmaAB.toFixed(2) + " m";
+
+        reinitialiserSigma();
+        afficher();
+
+        return;
+    }
+
 
     if (!pointA) {
 
@@ -1327,6 +1503,51 @@ function demarrerGPS() {
             historiqueGPS.push(
                 nouveauPoint
             );
+
+            
+            // Enregistrement brut du trajet A-B
+            // uniquement en mode GPS réel
+
+            
+            // Attendre une vitesse suffisante pendant 3 secondes
+            if (
+                etatConstructionAB === "ATTENTE_VITESSE"
+            ) {
+                if (vitesseKmH >= VITESSE_DEPART_AB) {
+
+                    if (debutVitesseAB === null) {
+                        debutVitesseAB = Date.now();
+                    }
+
+                    if (
+                        Date.now() - debutVitesseAB >=
+                        DUREE_CONFIRMATION_AB_MS
+                    ) {
+                        etatConstructionAB = "ENREGISTREMENT";
+
+                        document.getElementById("etatReference")
+                            .textContent =
+                            "A enregistré — enregistrement du trajet vers B";
+                    }
+
+                } else {
+                    // Si la vitesse redescend, le délai repart à zéro
+                    debutVitesseAB = null;
+                }
+            }
+
+
+            if (
+                etatConstructionAB === "ENREGISTREMENT"
+            ) {
+                pointsReferenceAB.push({
+                    x: nouveauPoint.x,
+                    y: nouveauPoint.y,
+                    vitesseKmH: vitesseKmH,
+                    temps: nouveauPoint.temps
+                });
+            }
+
 
            if (
              vitesseKmH < VITESSE_MIN_DN
