@@ -892,8 +892,8 @@ if (
 
     ) {
 
-    tracteur.style.width = "60px";
-    tracteur.style.height = "30px";
+    tracteur.style.width = "30px";
+    tracteur.style.height = "60px";
     tracteur.style.top = "80px";
 
         // Orientation GPS réelle pendant le demi-tour
@@ -916,12 +916,12 @@ if (
         // Le tracteur est dessiné horizontalement dans ces modes
         tracteur.style.setProperty(
             "--angle-tracteur",
-            (angleRelatif + 90) + "deg"
+            angleRelatif + "deg"
         );
     } else {
         tracteur.style.setProperty(
             "--angle-tracteur",
-            "0deg"
+            "90deg"
         );
     }
 
