@@ -747,6 +747,7 @@ if (
     ecartTexte.innerHTML = "";
 ecartTexte.style.color = "black";
 ecartTexte.style.fontSize = "28px";
+ecartTexte.style.left = "50%";
 
     document.getElementById("avancement")
         .textContent = "0 m";
