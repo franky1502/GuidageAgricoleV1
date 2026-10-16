@@ -956,6 +956,7 @@ if (
     tracteur.style.width = "30px";
     tracteur.style.height = "60px";
     tracteur.style.top = "180px";
+    tracteur.style.left = "50%";
     tracteur.style.display = "block";
 
 // Orientation habituelle hors demi-tour et raccrochage
