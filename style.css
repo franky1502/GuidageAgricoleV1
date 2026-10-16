@@ -413,3 +413,11 @@ transform-origin: center center;
 .ligneRejetee {
     background: #ffb0b0;
 }
+
+#imageTracteur {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+}

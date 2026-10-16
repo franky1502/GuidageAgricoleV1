@@ -825,7 +825,7 @@ tracteur.style.left = positionTracteur + "%";
 
     if (Math.abs(ecartLigne) < 0.2) {
 
-        tracteur.style.background = "green";
+        document.getElementById("imageTracteur").src = "tracteur_vert.svg";
 
         ecartTexte.innerHTML = "";
 
@@ -836,21 +836,21 @@ tracteur.style.left = positionTracteur + "%";
 
 if (erreur < 1) {
 
-    tracteur.style.background = "orange";
+    document.getElementById("imageTracteur").src = "tracteur_orange.svg";
     ecartTexte.style.color = "orange";
     ecartTexte.style.fontSize = "28px";
     ecartTexte.style.top = "195px";
 }
 else if (erreur <= 3) {
 
-    tracteur.style.background = "#cc0000";
+    document.getElementById("imageTracteur").src = "tracteur_rouge.svg";
     ecartTexte.style.color = "#cc0000";
     ecartTexte.style.fontSize = "28px";
     ecartTexte.style.top = "195px";
 }
 else {
 
-    tracteur.style.background = "#ff0000";
+    document.getElementById("imageTracteur").src = "tracteur_rouge.svg";
     ecartTexte.style.color = "#ff0000";
     ecartTexte.style.fontSize = "42px";
     ecartTexte.style.fontWeight = "900";
