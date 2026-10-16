@@ -54,6 +54,11 @@ const MODE_PAUSE = 3;
 let modeGuidage = MODE_TRAVAIL;
 let ligneCible = 0;
 
+let nombreCapsDemiTour = 0;
+const NB_CAPS_CONFIRMATION_DEMI_TOUR = 3;
+const SEUIL_CAP_DEMI_TOUR = 45;
+
+
 let demiTourActif = false;
 let progressionDemiTour = 0;
 
@@ -695,12 +700,38 @@ restantDemiTour =
         distanceTracteur
     );
 
-if (
-    modeGuidage === MODE_DEMI_TOUR &&
-    restantDemiTour < 4
-) {
-    modeGuidage = MODE_RACCROCHAGE;
+
+if (modeGuidage === MODE_DEMI_TOUR) {
+
+    if (!modeGPS) {
+
+        // Conserver le comportement du simulateur
+        if (restantDemiTour < 4) {
+            modeGuidage = MODE_RACCROCHAGE;
+        }
+
+    } else {
+
+        // En GPS réel, vérifier aussi l'orientation
+        const capCible = (capAB + 180) % 360;
+
+        const ecartCapCible = Math.abs(
+            differenceAngulaire(capTracteur, capCible)
+        );
+
+        if (
+            restantDemiTour < 4 &&
+            ecartCapCible < 30
+        ) {
+            modeGuidage = MODE_RACCROCHAGE;
+
+            document.getElementById("etatReference")
+                .textContent =
+                "Raccrochage — ligne cible " + ligneCible;
+        }
+    }
 }
+
 
 if (
     modeGuidage === MODE_RACCROCHAGE &&
@@ -865,6 +896,35 @@ if (
     tracteur.style.height = "30px";
     tracteur.style.top = "80px";
 
+        // Orientation GPS réelle pendant le demi-tour
+    // et le raccrochage uniquement
+    if (
+        modeGPS &&
+        Number.isFinite(capTracteur) &&
+        Number.isFinite(capAB)
+    ) {
+        let angleRelatif =
+            differenceAngulaire(capTracteur, capAB);
+
+        // Le tracteur peut suivre l'axe dans les deux sens
+        if (angleRelatif > 90) {
+            angleRelatif -= 180;
+        } else if (angleRelatif < -90) {
+            angleRelatif += 180;
+        }
+
+        // Le tracteur est dessiné horizontalement dans ces modes
+        tracteur.style.setProperty(
+            "--angle-tracteur",
+            (angleRelatif + 90) + "deg"
+        );
+    } else {
+        tracteur.style.setProperty(
+            "--angle-tracteur",
+            "0deg"
+        );
+    }
+
     if (sensDemiTour === DEMI_TOUR_DROITE) {
     tracteur.style.left = "72%";
 } else {
@@ -892,6 +952,10 @@ if (
     tracteur.style.height = "60px";
     tracteur.style.top = "180px";
     tracteur.style.display = "block";
+
+// Orientation habituelle hors demi-tour et raccrochage
+    tracteur.style.setProperty("--angle-tracteur", "0deg");
+
 }
 
 
@@ -1503,6 +1567,94 @@ function demarrerGPS() {
             historiqueGPS.push(
                 nouveauPoint
             );
+
+            
+            // Position GPS lissée du tracteur
+            const nombrePointsLissage =
+                (
+                    modeGuidage === MODE_DEMI_TOUR ||
+                    modeGuidage === MODE_RACCROCHAGE
+                ) ? 3 : 5;
+
+            const pointsLisses =
+                historiqueGPS.slice(-nombrePointsLissage);
+
+            const sommeXTracteur =
+                pointsLisses.reduce(
+                    (somme, point) => somme + point.x,
+                    0
+                );
+
+            const sommeYTracteur =
+                pointsLisses.reduce(
+                    (somme, point) => somme + point.y,
+                    0
+                );
+
+            tracteurX =
+                sommeXTracteur / pointsLisses.length;
+
+            tracteurY =
+                sommeYTracteur / pointsLisses.length;
+
+            // Cap fourni par l'iPhone, s'il est disponible
+            if (Number.isFinite(cap)) {
+                capTracteur = cap;
+            }
+
+            
+            // Détection du début du demi-tour en GPS réel
+            if (
+                pointA &&
+                pointB &&
+                modeGuidage === MODE_TRAVAIL &&
+                Number.isFinite(cap)
+            ) {
+                // Écart par rapport à l'axe A-B,
+                // dans l'un ou l'autre sens
+                const capInverseAB = (capAB + 180) % 360;
+
+                const ecartCapAxe = Math.min(
+                    Math.abs(differenceAngulaire(cap, capAB)),
+                    Math.abs(differenceAngulaire(cap, capInverseAB))
+                );
+
+                if (ecartCapAxe > SEUIL_CAP_DEMI_TOUR) {
+                    nombreCapsDemiTour++;
+                } else {
+                    nombreCapsDemiTour = 0;
+                }
+
+                if (
+                    nombreCapsDemiTour >=
+                    NB_CAPS_CONFIRMATION_DEMI_TOUR
+                ) {
+                    modeGuidage = MODE_DEMI_TOUR;
+
+                    if (modeReference === "bord") {
+                        ligneCible = ligne + 1;
+                    } else {
+                        ligneCible = ligne + sensDemiTour;
+                    }
+
+                    nombreCapsDemiTour = 0;
+
+                    document.getElementById("etatReference")
+                        .textContent =
+                        "Demi-tour détecté — ligne cible " +
+                        ligneCible;
+
+                    afficher();
+                }
+            } else {
+                nombreCapsDemiTour = 0;
+            }
+
+
+            // Actualiser l'affichage si A-B est définie
+            if (pointA && pointB) {
+                afficher();
+            }
 
             
             // Enregistrement brut du trajet A-B
