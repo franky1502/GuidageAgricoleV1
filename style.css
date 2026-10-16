@@ -140,7 +140,7 @@ button {
     transform: translateX(-50%) rotate(var(--angle-tracteur, 0deg));
 transform-origin: center center;
 
-    background: green;
+    background: transparent;
 }
 
 /* Ecart */
