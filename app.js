@@ -919,11 +919,16 @@ if (
             angleRelatif + "deg"
         );
     } else {
-        tracteur.style.setProperty(
-            "--angle-tracteur",
-            "90deg"
-        );
-    }
+    const angleSimulation =
+        sensDemiTour === DEMI_TOUR_DROITE
+            ? 90
+            : -90;
+
+    tracteur.style.setProperty(
+        "--angle-tracteur",
+        angleSimulation + "deg"
+    );
+}
 
     if (sensDemiTour === DEMI_TOUR_DROITE) {
     tracteur.style.left = "72%";
