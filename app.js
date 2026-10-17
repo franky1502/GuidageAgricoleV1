@@ -933,11 +933,15 @@ if (
 
         // Orientation GPS réelle pendant le demi-tour
     // et le raccrochage uniquement
-    if (
-        modeGPS &&
-        Number.isFinite(capTracteur) &&
-        Number.isFinite(capAB)
-    ) {
+    
+ // Orientation GPS réelle uniquement en mode Raccrochage
+if (
+    modeGPS &&
+    modeGuidage === MODE_RACCROCHAGE &&
+    Number.isFinite(capTracteur) &&
+    Number.isFinite(capAB)
+) {
+
         let angleRelatif =
             differenceAngulaire(capTracteur, capAB);
 
@@ -953,6 +957,22 @@ if (
             "--angle-tracteur",
             angleRelatif + "deg"
         );
+
+
+        // Afficher l'écart angulaire uniquement en GPS réel
+        const capCible = (capAB + 180) % 360;
+
+        const ecartCapCible = differenceAngulaire(
+            capTracteur,
+            capCible
+        );
+
+        document.getElementById("debugEcart").textContent =
+            "Écart angulaire : " +
+            ecartCapCible.toFixed(0) +
+            "°";
+
+
     } else {
     const angleSimulation =
         sensDemiTour === DEMI_TOUR_DROITE
