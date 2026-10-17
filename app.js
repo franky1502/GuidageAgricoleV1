@@ -3,8 +3,8 @@ let ligne = 0;
 let tracteurX = 14;
 let tracteurY = 10;
 
-let premierePasse = 6;
-let largeurTravail = 10;
+let premierePasse = 14;
+let largeurTravail = 20;
 let modeReference = "bord";
 
 let ecart = 0;
