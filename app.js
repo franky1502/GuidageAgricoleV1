@@ -723,8 +723,8 @@ if (modeGuidage === MODE_DEMI_TOUR) {
         );
 
         if (
-            restantDemiTour < 4 /*&&
-            ecartCapCible < 30 */
+            restantDemiTour < 4 &&
+            ecartCapCible < 30 
         ) {
             modeGuidage = MODE_RACCROCHAGE;
 
