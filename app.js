@@ -58,8 +58,6 @@ let nombreCapsDemiTour = 0;
 const NB_CAPS_CONFIRMATION_DEMI_TOUR = 3;
 const SEUIL_CAP_DEMI_TOUR = 45;
 const SEUIL_RACCROCHAGE = 1.00; // mètres
-const seuilRaccrochageActuel =
-    modeGPS ? SEUIL_RACCROCHAGE : 0.50;
 
 
 let demiTourActif = false;
@@ -737,6 +735,8 @@ if (modeGuidage === MODE_DEMI_TOUR) {
     }
 }
 
+const seuilRaccrochageActuel =
+    modeGPS ? SEUIL_RACCROCHAGE : 0.50;
 
 if (
     modeGuidage === MODE_RACCROCHAGE &&
