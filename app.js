@@ -802,18 +802,36 @@ if (
 
 if (pointA && pointB) {
 
-    if (
-        modeGuidage === MODE_TRAVAIL
-    ) {
-        const avancement =
-            avancementAB(
-                tracteurX,
-                tracteurY
-            );
+    if (modeGuidage === MODE_TRAVAIL) {
 
-        document.getElementById("avancement")
-            .textContent =
-            avancement.toFixed(0) + " m";
+        if (modeGPS && pointDepartLigneGPS !== null) {
+
+            const dx =
+                tracteurX - pointDepartLigneGPS.x;
+
+            const dy =
+                tracteurY - pointDepartLigneGPS.y;
+
+            const distanceReelle =
+                Math.sqrt(dx * dx + dy * dy);
+
+            document.getElementById("avancement")
+                .textContent =
+                distanceReelle.toFixed(0) + " m";
+
+        } else if (!modeGPS) {
+
+            // Simulateur : conserver le calcul existant
+            const avancement =
+                avancementAB(
+                    tracteurX,
+                    tracteurY
+                );
+
+            document.getElementById("avancement")
+                .textContent =
+                avancement.toFixed(0) + " m";
+        }
     }
 }
 
