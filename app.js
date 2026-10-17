@@ -3,8 +3,8 @@ let ligne = 0;
 let tracteurX = 14;
 let tracteurY = 10;
 
-let premierePasse = 14;
-let largeurTravail = 20;
+let premierePasse = 6;
+let largeurTravail = 10;
 let modeReference = "bord";
 
 let ecart = 0;
@@ -723,8 +723,8 @@ if (modeGuidage === MODE_DEMI_TOUR) {
         );
 
         if (
-            restantDemiTour < 4 &&
-            ecartCapCible < 30
+            restantDemiTour < 4 /*&&
+            ecartCapCible < 30 */
         ) {
             modeGuidage = MODE_RACCROCHAGE;
 
@@ -930,6 +930,10 @@ if (
     tracteur.style.width = "30px";
     tracteur.style.height = "60px";
     tracteur.style.top = "80px";
+    tracteur.classList.toggle(
+    "axe-visible",
+    modeGPS && modeGuidage === MODE_RACCROCHAGE
+);
 
         // Orientation GPS réelle pendant le demi-tour
     // et le raccrochage uniquement
@@ -958,6 +962,25 @@ if (
             angleRelatif + "deg"
         );
 
+        
+        // Affichage de l'écart angulaire dans la ZDG
+        const angleRaccrochage =
+            document.getElementById("angleRaccrochage");
+
+        const capCible = (capAB + 180) % 360;
+
+        const ecartCapCible = differenceAngulaire(
+            capTracteur,
+            capCible
+        );
+
+        angleRaccrochage.textContent =
+            "Écart angulaire : " +
+            ecartCapCible.toFixed(0) +
+            "°";
+
+        angleRaccrochage.style.display = "block";
+
 
         // Afficher l'écart angulaire uniquement en GPS réel
         const capCible = (capAB + 180) % 360;
@@ -983,6 +1006,13 @@ if (
         "--angle-tracteur",
         angleSimulation + "deg"
     );
+}
+
+if (
+    !modeGPS ||
+    modeGuidage !== MODE_RACCROCHAGE
+) {
+    document.getElementById("angleRaccrochage").style.display = "none";
 }
 
     if (sensDemiTour === DEMI_TOUR_DROITE) {
