@@ -57,6 +57,9 @@ let ligneCible = 0;
 let nombreCapsDemiTour = 0;
 const NB_CAPS_CONFIRMATION_DEMI_TOUR = 3;
 const SEUIL_CAP_DEMI_TOUR = 45;
+const SEUIL_RACCROCHAGE = 1.00; // mètres
+const seuilRaccrochageActuel =
+    modeGPS ? SEUIL_RACCROCHAGE : 0.50;
 
 
 let demiTourActif = false;
@@ -101,6 +104,8 @@ const DEMI_TOUR_DROITE = 1;
 const DEMI_TOUR_GAUCHE = -1;
 
 let sensDemiTour = DEMI_TOUR_DROITE;
+
+let pointDepartLigneGPS = null;
 
 const ligneMoins = document.getElementById("ligneMoins");
 const ligneActive = document.getElementById("ligneActive");
@@ -735,10 +740,17 @@ if (modeGuidage === MODE_DEMI_TOUR) {
 
 if (
     modeGuidage === MODE_RACCROCHAGE &&
-    restantDemiTour < 0.50
+    restantDemiTour < seuilRaccrochageActuel
 ) {
     modeGuidage = MODE_TRAVAIL;
     ligne = ligneCible;
+
+        if (modeGPS) {
+        pointDepartLigneGPS = {
+            x: tracteurX,
+            y: tracteurY
+        };
+    }
 
     capTracteur = capAB;
 
