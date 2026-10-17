@@ -1488,6 +1488,11 @@ function demarrerGPS() {
             const vitesseKmH =
             vitesse * 3.6;
 
+            if (modeGPS) {
+    document.getElementById("vitesse").textContent =
+        vitesseKmH.toFixed(1) + " km/h";
+}
+
             const cap =
                 position.coords.heading;
 
