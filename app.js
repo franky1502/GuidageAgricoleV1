@@ -704,6 +704,7 @@ restantDemiTour =
     );
 
 
+
 if (modeGuidage === MODE_DEMI_TOUR) {
 
     if (!modeGPS) {
@@ -715,17 +716,9 @@ if (modeGuidage === MODE_DEMI_TOUR) {
 
     } else {
 
-        // En GPS réel, vérifier aussi l'orientation
-        const capCible = (capAB + 180) % 360;
-
-        const ecartCapCible = Math.abs(
-            differenceAngulaire(capTracteur, capCible)
-        );
-
-        if (
-            restantDemiTour < 4 &&
-            ecartCapCible < 30 
-        ) {
+        // En GPS réel, entrer en raccrochage dès que
+        // la ligne cible est à moins de 4 mètres
+        if (restantDemiTour < 4) {
             modeGuidage = MODE_RACCROCHAGE;
 
             document.getElementById("etatReference")
@@ -737,6 +730,7 @@ if (modeGuidage === MODE_DEMI_TOUR) {
 
 const seuilRaccrochageActuel =
     modeGPS ? SEUIL_RACCROCHAGE : 0.50;
+
 
 if (
     modeGuidage === MODE_RACCROCHAGE &&
