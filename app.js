@@ -981,15 +981,6 @@ if (
 
         angleRaccrochage.style.display = "block";
 
-
-        // Afficher l'écart angulaire uniquement en GPS réel
-        const capCible = (capAB + 180) % 360;
-
-        const ecartCapCible = differenceAngulaire(
-            capTracteur,
-            capCible
-        );
-
         document.getElementById("debugEcart").textContent =
             "Écart angulaire : " +
             ecartCapCible.toFixed(0) +
