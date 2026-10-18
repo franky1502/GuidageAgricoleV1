@@ -57,6 +57,10 @@ let ligneCible = 0;
 let nombreCapsDemiTour = 0;
 const NB_CAPS_CONFIRMATION_DEMI_TOUR = 3;
 const SEUIL_CAP_DEMI_TOUR = 45;
+
+let sensCandidatDemiTour = 0;
+let capPrecedentDemiTour = null;
+let rotationCumuleeDemiTour = 0;
 const SEUIL_RACCROCHAGE = 1.00; // mètres
 
 
@@ -760,14 +764,19 @@ ecartTexte.style.left = "50%";
         
     reinitialiserSigma();
 
-// Après le demi-tour, on inverse le sens d'affichage
-    if (sensDemiTour === DEMI_TOUR_DROITE) {
-        sensDemiTour = DEMI_TOUR_GAUCHE;
-    } else {
-        sensDemiTour = DEMI_TOUR_DROITE;
+
+    // Après le demi-tour, inverser le sens uniquement
+    // dans le simulateur
+    if (!modeGPS) {
+        if (sensDemiTour === DEMI_TOUR_DROITE) {
+            sensDemiTour = DEMI_TOUR_GAUCHE;
+        } else {
+            sensDemiTour = DEMI_TOUR_DROITE;
+        }
     }
 
     afficherEtatReference();
+
 }
 
 
@@ -1145,12 +1154,12 @@ if (pointPauseRetrouve) {
 
     return;
 }
-
-
-
 }
 
+
 function distanceSigneeAB(px, py) {
+/* calcul la distance perpendiculaire signée entre le point GPS
+ (px,py) et la droite passant par A et B */
 
     const dx = pointB.x - pointA.x;
     const dy = pointB.y - pointA.y;
@@ -1684,21 +1693,54 @@ function demarrerGPS() {
             }
 
             
+
             // Détection du début du demi-tour en GPS réel
             if (
+                modeGPS &&
                 pointA &&
                 pointB &&
                 modeGuidage === MODE_TRAVAIL &&
                 Number.isFinite(cap)
             ) {
-                // Écart par rapport à l'axe A-B,
-                // dans l'un ou l'autre sens
                 const capInverseAB = (capAB + 180) % 360;
 
+                const ecartAB =
+                    differenceAngulaire(cap, capAB);
+
+                const ecartInverseAB =
+                    differenceAngulaire(cap, capInverseAB);
+
                 const ecartCapAxe = Math.min(
-                    Math.abs(differenceAngulaire(cap, capAB)),
-                    Math.abs(differenceAngulaire(cap, capInverseAB))
+                    Math.abs(ecartAB),
+                    Math.abs(ecartInverseAB)
                 );
+
+                // Commencer à cumuler la rotation dès que
+                // le cap s'écarte de l'axe de plus de 10°
+                if (ecartCapAxe > 10) {
+
+                    if (capPrecedentDemiTour === null) {
+                        capPrecedentDemiTour = cap;
+                        rotationCumuleeDemiTour = 0;
+                    } else {
+                        const variationCap =
+                            differenceAngulaire(
+                                cap,
+                                capPrecedentDemiTour
+                            );
+
+                        rotationCumuleeDemiTour += variationCap;
+                        capPrecedentDemiTour = cap;
+                    }
+
+                } else {
+                    // Le tracteur est revenu près de l'axe :
+                    // réinitialiser la détection
+                    nombreCapsDemiTour = 0;
+                    capPrecedentDemiTour = null;
+                    rotationCumuleeDemiTour = 0;
+                    sensCandidatDemiTour = 0;
+                }
 
                 if (ecartCapAxe > SEUIL_CAP_DEMI_TOUR) {
                     nombreCapsDemiTour++;
@@ -1710,27 +1752,63 @@ function demarrerGPS() {
                     nombreCapsDemiTour >=
                     NB_CAPS_CONFIRMATION_DEMI_TOUR
                 ) {
-                    modeGuidage = MODE_DEMI_TOUR;
+                    // Déterminer si le tracteur circulait
+                    // dans le sens A->B ou B->A
+                    const sensCirculationAB =
+                        Math.abs(ecartAB) <=
+                        Math.abs(ecartInverseAB)
+                            ? 1
+                            : -1;
 
-                    if (modeReference === "bord") {
-                        ligneCible = ligne + 1;
-                    } else {
-                        ligneCible = ligne + sensDemiTour;
+                    // Convertir la rotation du cap en côté
+                    // positif ou négatif de l'axe AB
+                    const rotationSignee =
+                        rotationCumuleeDemiTour *
+                        sensCirculationAB;
+
+                    if (Math.abs(rotationCumuleeDemiTour) >= 15) {
+                        sensCandidatDemiTour =
+                            rotationSignee > 0
+                                ? DEMI_TOUR_DROITE
+                                : DEMI_TOUR_GAUCHE;
+
+                        sensDemiTour = sensCandidatDemiTour;
+
+                        modeGuidage = MODE_DEMI_TOUR;
+
+                        if (modeReference === "bord") {
+                            ligneCible = ligne + 1;
+                        } else {
+                            ligneCible =
+                                ligne + sensDemiTour;
+                        }
+
+                        document.getElementById("etatReference")
+                            .textContent =
+                            "Demi-tour détecté — ligne cible " +
+                            ligneCible;
+
+                        afficher();
                     }
 
                     nombreCapsDemiTour = 0;
-
-                    document.getElementById("etatReference")
-                        .textContent =
-                        "Demi-tour détecté — ligne cible " +
-                        ligneCible;
-
-                    afficher();
+                    capPrecedentDemiTour = null;
+                    rotationCumuleeDemiTour = 0;
+                    sensCandidatDemiTour = 0;
                 }
+
+            } else if (!modeGPS) {
+
+                // Le simulateur conserve son comportement existant
+
             } else {
                 nombreCapsDemiTour = 0;
+                capPrecedentDemiTour = null;
+                rotationCumuleeDemiTour = 0;
+                sensCandidatDemiTour = 0;
             }
 
+  
 
             // Actualiser l'affichage si A-B est définie
             if (pointA && pointB) {
