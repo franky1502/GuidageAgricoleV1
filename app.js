@@ -1027,6 +1027,9 @@ if (
     ecartTexte.style.left = "28%";
 }
 
+
+ecartTexte.style.display = "block";
+
     ecartTexte.innerHTML =
         restantDemiTour.toFixed(1) + " m";
 
