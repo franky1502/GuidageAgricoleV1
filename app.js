@@ -779,16 +779,11 @@ ecartTexte.style.left = "50%";
 
 }
 
-
-document.getElementById("debugEcart").textContent =
-    "Mode=" + (modeGPS ? "GPS" : "Simu") +
-    " | Guidage=" + modeGuidage +
-    " | Ligne=" + ligne +
-    " | Cible=" + ligneCible +
+document.getElementById("etatReference").textContent =
+    "Ligne cible " + ligneCible +
     " | DistTrac=" + distanceTracteur.toFixed(1) +
     " | DistCible=" + distanceCible.toFixed(1) +
     " | Bleu=" + restantDemiTour.toFixed(1) + " m";
-
 
 
 if (
