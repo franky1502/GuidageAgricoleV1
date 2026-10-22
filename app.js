@@ -781,11 +781,13 @@ ecartTexte.style.left = "50%";
 
 
 document.getElementById("debugEcart").textContent =
-    "Ligne=" + ligne +
-    "  Cible=" + ligneCible +
-    "  DistTrac=" + distanceTracteur.toFixed(1) +
-    "  DistCible=" + distanceCible.toFixed(1) +
-    "  Reste=" + restantDemiTour.toFixed(1);
+    "Mode=" + (modeGPS ? "GPS" : "Simu") +
+    " | Guidage=" + modeGuidage +
+    " | Ligne=" + ligne +
+    " | Cible=" + ligneCible +
+    " | DistTrac=" + distanceTracteur.toFixed(1) +
+    " | DistCible=" + distanceCible.toFixed(1) +
+    " | Bleu=" + restantDemiTour.toFixed(1) + " m";
 
 
 
