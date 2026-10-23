@@ -1752,19 +1752,10 @@ function demarrerGPS() {
                     nombreCapsDemiTour >=
                     NB_CAPS_CONFIRMATION_DEMI_TOUR
                 ) {
-                    // Déterminer si le tracteur circulait
-                    // dans le sens A->B ou B->A
-                    const sensCirculationAB =
-                        Math.abs(ecartAB) <=
-                        Math.abs(ecartInverseAB)
-                            ? 1
-                            : -1;
-
-                    // Convertir la rotation du cap en côté
-                    // positif ou négatif de l'axe AB
-                    const rotationSignee =
-                        rotationCumuleeDemiTour *
-                        sensCirculationAB;
+                    // la valeur positive ou négative de la rotation
+                    // donne le sens du demi-tour (droit ou gauche)
+                    
+                    const rotationSignee = rotationCumuleeDemiTour;
 
                     if (Math.abs(rotationCumuleeDemiTour) >= 15) {
                         sensCandidatDemiTour =
@@ -1783,10 +1774,9 @@ function demarrerGPS() {
                                 ligne + sensDemiTour;
                         }
 
-                        document.getElementById("etatReference")
-                            .textContent =
-                            "Demi-tour détecté — ligne cible " +
-                            ligneCible;
+                     document.getElementById("etatReference").textContent =
+  (sensDemiTour === DEMI_TOUR_DROITE ? "Demi-tour droit" : "Demi-tour gauche")
+  + " — ligne cible " + ligneCible;  
 
                         afficher();
                     }
