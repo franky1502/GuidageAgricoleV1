@@ -1532,7 +1532,7 @@ function demarrerGPS() {
 
 
             /*
-             * 1. Lecture GPS
+             * 1. Lecture GPS et historique
              */
 
             const lat =
@@ -1694,97 +1694,111 @@ function demarrerGPS() {
 
             
 
+           
             // Détection du début du demi-tour en GPS réel
             if (
                 modeGPS &&
                 pointA &&
                 pointB &&
-                modeGuidage === MODE_TRAVAIL &&
-                Number.isFinite(cap)
+                modeGuidage === MODE_TRAVAIL
             ) {
-                const capInverseAB = (capAB + 180) % 360;
+                // Si le cap est momentanément indisponible,
+                // conserver l'état de détection et attendre
+                // une nouvelle mesure valide.
+                if (Number.isFinite(cap)) {
 
-                const ecartAB =
-                    differenceAngulaire(cap, capAB);
+                    const capInverseAB = (capAB + 180) % 360;
 
-                const ecartInverseAB =
-                    differenceAngulaire(cap, capInverseAB);
+                    const ecartAB =
+                        differenceAngulaire(cap, capAB);
 
-                const ecartCapAxe = Math.min(
-                    Math.abs(ecartAB),
-                    Math.abs(ecartInverseAB)
-                );
+                    const ecartInverseAB =
+                        differenceAngulaire(cap, capInverseAB);
 
-                // Commencer à cumuler la rotation dès que
-                // le cap s'écarte de l'axe de plus de 10°
-                if (ecartCapAxe > 10) {
+                    const ecartCapAxe = Math.min(
+                        Math.abs(ecartAB),
+                        Math.abs(ecartInverseAB)
+                    );
 
-                    if (capPrecedentDemiTour === null) {
-                        capPrecedentDemiTour = cap;
-                        rotationCumuleeDemiTour = 0;
-                    } else {
-                        const variationCap =
-                            differenceAngulaire(
-                                cap,
-                                capPrecedentDemiTour
-                            );
+                    // Commencer à cumuler la rotation dès que
+                    // le cap s'écarte de l'axe de plus de 10°
+                    if (ecartCapAxe > 10) {
 
-                        rotationCumuleeDemiTour += variationCap;
-                        capPrecedentDemiTour = cap;
-                    }
-
-                } else {
-                    // Le tracteur est revenu près de l'axe :
-                    // réinitialiser la détection
-                    nombreCapsDemiTour = 0;
-                    capPrecedentDemiTour = null;
-                    rotationCumuleeDemiTour = 0;
-                    sensCandidatDemiTour = 0;
-                }
-
-                if (ecartCapAxe > SEUIL_CAP_DEMI_TOUR) {
-                    nombreCapsDemiTour++;
-                } else {
-                    nombreCapsDemiTour = 0;
-                }
-
-                if (
-                    nombreCapsDemiTour >=
-                    NB_CAPS_CONFIRMATION_DEMI_TOUR
-                ) {
-                    // la valeur positive ou négative de la rotation
-                    // donne le sens du demi-tour (droit ou gauche)
-                    
-                    const rotationSignee = rotationCumuleeDemiTour;
-
-                    if (Math.abs(rotationCumuleeDemiTour) >= 15) {
-                        sensCandidatDemiTour =
-                            rotationSignee > 0
-                                ? DEMI_TOUR_DROITE
-                                : DEMI_TOUR_GAUCHE;
-
-                        sensDemiTour = sensCandidatDemiTour;
-
-                        modeGuidage = MODE_DEMI_TOUR;
-
-                        if (modeReference === "bord") {
-                            ligneCible = ligne + 1;
+                        if (capPrecedentDemiTour === null) {
+                            capPrecedentDemiTour = cap;
+                            rotationCumuleeDemiTour = 0;
                         } else {
-                            ligneCible =
-                                ligne + sensDemiTour;
+                            const variationCap =
+                                differenceAngulaire(
+                                    cap,
+                                    capPrecedentDemiTour
+                                );
+
+                            rotationCumuleeDemiTour += variationCap;
+                            capPrecedentDemiTour = cap;
                         }
 
-                     document.getElementById("etatReference").textContent =
-  (sensDemiTour === DEMI_TOUR_DROITE ? "Demi-tour droit" : "Demi-tour gauche")
-  + " — ligne cible " + ligneCible;  
-
-                        afficher();
+                    } else {
+                        // Le tracteur est revenu près de l'axe :
+                        // réinitialiser la détection
+                        nombreCapsDemiTour = 0;
+                        capPrecedentDemiTour = null;
+                        rotationCumuleeDemiTour = 0;
+                        sensCandidatDemiTour = 0;
                     }
 
-                    nombreCapsDemiTour = 0;
-                    capPrecedentDemiTour = null;
-                    rotationCumuleeDemiTour = 0;
-                    sensCandidatDemiTour = 0;
+                    if (ecartCapAxe > SEUIL_CAP_DEMI_TOUR) {
+                        nombreCapsDemiTour++;
+                    } else {
+                        nombreCapsDemiTour = 0;
+                    }
+
+
+if (
+    nombreCapsDemiTour >=
+    NB_CAPS_CONFIRMATION_DEMI_TOUR
+) {
+    // Le signe de la rotation détermine
+    // le sens du demi-tour.
+    const rotationSignee =
+        rotationCumuleeDemiTour;
+
+    // Ancienne condition de rotation cumulée,
+    // conservée temporairement pour les essais :
+    // if (Math.abs(rotationCumuleeDemiTour) >= 15) {
+
+        sensCandidatDemiTour =
+            rotationSignee >= 0
+                ? DEMI_TOUR_DROITE
+                : DEMI_TOUR_GAUCHE;
+
+        sensDemiTour = sensCandidatDemiTour;
+
+        modeGuidage = MODE_DEMI_TOUR;
+
+        if (modeReference === "bord") {
+            ligneCible = ligne + 1;
+        } else {
+            ligneCible =
+                ligne + sensDemiTour;
+        }
+
+        document.getElementById("etatReference").textContent =
+            (sensDemiTour === DEMI_TOUR_DROITE
+                ? "Demi-tour droit"
+                : "Demi-tour gauche")
+            + " — ligne cible " + ligneCible;
+
+        afficher();
+
+    // } // Fin de l'ancienne condition des 15°
+
+    nombreCapsDemiTour = 0;
+    capPrecedentDemiTour = null;
+    rotationCumuleeDemiTour = 0;
+    sensCandidatDemiTour = 0;
+}
+
                 }
 
             } else if (!modeGPS) {
